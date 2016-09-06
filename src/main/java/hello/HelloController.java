@@ -6,31 +6,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.SpanAccessor;
+import org.springframework.cloud.sleuth.Span;
 
 @RestController
 public class HelloController {
     private static Logger logger = LoggerFactory.getLogger(HelloController.class);
 
+    @Autowired
+    private SpanAccessor accessor;
+
     @RequestMapping("/")
     public String index() throws Exception {
-        logger.info("handling request");
-        return getAPI();
-    }
+        Span currentSpan = this.accessor.getCurrentSpan();
+        List<Long> parents = currentSpan.getParents();
+        List<String> parentsHex = new ArrayList<String>();
 
-    private static String getAPI() throws Exception {
-        logger.info("getting api info");
-        StringBuilder result = new StringBuilder();
-        URL url = new URL("https://api.superman.cf-app.com/v2/info");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
+        for (int i = 0; i < parents.size(); i++) {
+            String hex = Long.toHexString(parents.get(i));
+            parentsHex.add(hex);
         }
-        rd.close();
-        logger.info("got api info");
-        return result.toString();
+
+        logger.info("handling request");
+        return "current span: " + currentSpan + "\n parents: " + parentsHex;
     }
 }
