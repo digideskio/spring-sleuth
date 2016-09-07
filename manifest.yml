@@ -4,7 +4,7 @@ applications:
   memory: 512M
   instances: 1
   host: hello-sleuth-${random-word}
-  domain: superman.cf-app.com
+  domain: domain.com
   path: target/hello-sleuth-0.1.0.jar
   env:
     SPRING_PROFILES_DEFAULT: cloud
