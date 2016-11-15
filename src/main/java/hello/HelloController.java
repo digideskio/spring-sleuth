@@ -26,11 +26,13 @@ public class HelloController {
         List<String> parentsHex = new ArrayList<String>();
 
         for (int i = 0; i < parents.size(); i++) {
-            String hex = Long.toHexString(parents.get(i));
+            String hex = String.format("%016x", parents.get(i));
             parentsHex.add(hex);
         }
+        String traceID = String.format("%016x", currentSpan.getTraceId());
+        String spanID = String.format("%016x", currentSpan.getSpanId());
 
         logger.info("handling request");
-        return "current span: " + currentSpan + "\n parents: " + parentsHex;
+        return "current span: [Trace: " + traceID + ", Span: "+ spanID +", exportable:" + currentSpan.isExportable() +"]\n parents: " + parentsHex;
     }
 }
